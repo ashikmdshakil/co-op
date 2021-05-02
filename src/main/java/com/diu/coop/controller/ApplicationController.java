@@ -63,6 +63,21 @@ public class ApplicationController {
         return status;
     }
 
+    @PostMapping(value = "updateUser",consumes="application/json")
+    @ResponseBody
+    public String updateUser(@RequestBody Users user) {
+        String status = null;
+        try {
+            userRepo.save(user);
+            status = "success";
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            status = "failed";
+        }
+        return status;
+    }
+
     @GetMapping("getUser")
     @ResponseBody
     public Users getUser(@RequestParam("mobileNumber") String number){
