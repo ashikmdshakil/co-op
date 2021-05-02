@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 @Component
 @Entity
 @Scope(scopeName = "prototype")
-public class DepositTransaction {
+public class LoanTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private float amount;
     private LocalDateTime time;
     @ManyToOne
-    private Deposit deposit;
+    private Loan loan;
 
     public int getId() {
         return id;
@@ -41,11 +41,11 @@ public class DepositTransaction {
         this.time = time;
     }
 
-    public Deposit getDeposit() {
-        return deposit;
+    public Loan getLoan() {
+        return loan;
     }
 
-    public void setDeposit(Deposit deposit) {
-        this.deposit = deposit;
+    public void setLoan(Loan loan) {
+        this.loan = loan;
     }
 }

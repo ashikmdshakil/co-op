@@ -41,6 +41,7 @@ public class Users {
     private String loginIp;
     private LocalDateTime lastLoginDate;
     private String lastLoginIp;
+    private String address;
     @Column(columnDefinition = "boolean default false")
     private boolean aggreedToTermOfUse;
     @Column(columnDefinition = "boolean default false")
@@ -51,6 +52,9 @@ public class Users {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Deposit> deposits;
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Loan> loans;
 
     public int getUserId() {
         return userId;
@@ -170,5 +174,29 @@ public class Users {
 
     public void setDeposites(List<Deposit> deposites) {
         this.deposits = deposits;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public List<Deposit> getDeposits() {
+        return deposits;
+    }
+
+    public void setDeposits(List<Deposit> deposits) {
+        this.deposits = deposits;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
     }
 }

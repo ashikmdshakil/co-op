@@ -1,10 +1,7 @@
 package com.diu.coop.controller;
 
 import com.diu.coop.model.*;
-import com.diu.coop.repositories.DepositJPARepository;
-import com.diu.coop.repositories.DepositOptionsJpaRepository;
-import com.diu.coop.repositories.DepositTransactionJpaRepository;
-import com.diu.coop.repositories.UserJPARepository;
+import com.diu.coop.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,7 +31,18 @@ public class ApplicationController {
     private DepositOptions depositOptions;
     @Autowired
     private DepositOptionsJpaRepository depositOptionRepo;
+    @Autowired
     private DepositTransactionJpaRepository depositTransactionRepo;
+    @Autowired
+    private Loan loan;
+    @Autowired
+    private LoanJPARepository loanRepo;
+    @Autowired
+    private LoanOption loanOptions;
+    @Autowired
+    private LoanOptionJpaRepository loanOptionRepo;
+    @Autowired
+    private LoanTransactionJpaRepository loanTransactionJpaRepo;
 
     @GetMapping("/")
     public String getHomePage(){
@@ -132,10 +140,9 @@ public class ApplicationController {
         return status;
     }
 
-
     @GetMapping("getUserDeposit")
     @ResponseBody
-    public Deposit getDeposit(@RequestParam("userId") int id){
+    public Deposit getDeposit(@RequestParam("depositId") int id){
         return depositRepo.findById(id);
     }
 
@@ -143,6 +150,56 @@ public class ApplicationController {
     @ResponseBody
     public List<Deposit> getDeposits(@RequestParam("userId") int id){
         return depositRepo.findByUserUserId(id);
+    }
+
+    @PostMapping(value = "takeLoan")
+    @ResponseBody
+    public String takeLoan(@RequestParam("loanOptionId") int id, @RequestParam("userId") int userId) {
+        String status = null;
+        try {
+            loanOptions = loanOptionRepo.findById(id);
+            user = userRepo.findByUserId(id);
+            loan.setTotalMonths(loanOptions.getMonths());
+            loan.setTargetAmount(loanOptions.getAmount());
+            loan.setTotalAmount((loanOptions.getAmount() * loanOptions.getPercentage())/100);
+            loan.setLastInstallmentDate(LocalDateTime.now().plusMonths(loanOptions.getMonths()));
+            loan.setUser(user);
+            loanRepo.save(loan);
+            status = "success";
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            status = "failed";
+        }
+        return status;
+    }
+
+    @PostMapping(value = "makeLoanTransaction",consumes="application/json")
+    @ResponseBody
+    public String makeLoanTransaction(@RequestBody LoanTransaction loanTransaction) {
+        String status = null;
+        try {
+            loanTransaction.setTime(LocalDateTime.now());
+            loanTransactionJpaRepo.save(loanTransaction);
+            status = "success";
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            status = "failed";
+        }
+        return status;
+    }
+
+    @GetMapping("getUserLoan")
+    @ResponseBody
+    public Loan getLoan(@RequestParam("loanId") int id){
+        return loanRepo.findById(id);
+    }
+
+    @GetMapping("getUserLoans")
+    @ResponseBody
+    public List<Loan> getLoans(@RequestParam("userId") int id){
+        return loanRepo.findByUserUserId(id);
     }
 
     @PostMapping("logoutUser")
