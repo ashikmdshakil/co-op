@@ -50,7 +50,7 @@ public class Users {
     private Roles roles;
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<Deposite> deposites;
+    private List<Deposit> deposits;
 
     public int getUserId() {
         return userId;
@@ -164,11 +164,11 @@ public class Users {
         this.roles = roles;
     }
 
-    public List<Deposite> getDeposites() {
-        return deposites;
+    public List<Deposit> getDeposites() {
+        return deposits;
     }
 
-    public void setDeposites(List<Deposite> deposites) {
-        this.deposites = deposites;
+    public void setDeposites(List<Deposit> deposites) {
+        this.deposits = deposits;
     }
 }

@@ -1,7 +1,9 @@
 package com.diu.coop.controller;
 
+import com.diu.coop.model.Deposit;
 import com.diu.coop.model.Roles;
 import com.diu.coop.model.Users;
+import com.diu.coop.repositories.DepositJPARepository;
 import com.diu.coop.repositories.UserJPARepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class ApplicationController {
@@ -21,6 +24,8 @@ public class ApplicationController {
     private UserJPARepository userRepo;
     @Autowired
     private Roles role;
+    @Autowired
+    private DepositJPARepository depositRepo;
 
     @GetMapping("/")
     public String getHomePage(){
@@ -57,6 +62,34 @@ public class ApplicationController {
         }
         return status;
     }
+
+    @GetMapping("getUser")
+    @ResponseBody
+    public Users getUser(@RequestParam("mobileNumber") String number){
+        return userRepo.findByMobileNumber(number);
+    }
+
+    @PostMapping(value = "saveDiposit",consumes="application/json")
+    @ResponseBody
+    public String saveDeposit(@RequestBody Deposit deposit) {
+        String status = null;
+        try {
+            depositRepo.save(deposit);
+            status = "success";
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            status = "failed";
+        }
+        return status;
+    }
+
+    @GetMapping("getUserDeposits")
+    @ResponseBody
+    public List<Deposit> getDeposits(@RequestParam("userId") int id){
+        return depositRepo.findByUserUserId(id);
+    }
+
 
     @PostMapping("logoutUser")
     @ResponseBody

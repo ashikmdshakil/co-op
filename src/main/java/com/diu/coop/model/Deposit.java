@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Component
 @Entity
 @Scope(scopeName = "prototype")
-public class Deposite {
+public class Deposit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
