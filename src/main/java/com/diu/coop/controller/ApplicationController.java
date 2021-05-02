@@ -105,13 +105,24 @@ public class ApplicationController {
         return depositRepo.findByUserUserId(id);
     }
 
-
     @PostMapping("logoutUser")
     @ResponseBody
     public Principal logout(HttpSession session, HttpServletRequest request) {
         session.invalidate();
         SecurityContextHolder.clearContext();
         return request.getUserPrincipal();
+    }
+
+    @GetMapping("adminGetsUsers")
+    @ResponseBody
+    public List<Users> adminGetsUsers(){
+        return userRepo.findAll();
+    }
+
+    @GetMapping("adminGetsDeposits")
+    @ResponseBody
+    public List<Deposit> adminGetsDeposits(){
+        return depositRepo.findAll();
     }
 
 }
