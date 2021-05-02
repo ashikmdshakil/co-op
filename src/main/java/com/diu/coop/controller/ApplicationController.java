@@ -1,11 +1,12 @@
 package com.diu.coop.controller;
 
-import com.diu.coop.model.Deposit;
-import com.diu.coop.model.Roles;
-import com.diu.coop.model.Users;
+import com.diu.coop.model.*;
 import com.diu.coop.repositories.DepositJPARepository;
+import com.diu.coop.repositories.DepositOptionsJpaRepository;
+import com.diu.coop.repositories.DepositTransactionJpaRepository;
 import com.diu.coop.repositories.UserJPARepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
+@Scope(scopeName = "prototype")
 public class ApplicationController {
     @Autowired
     private Users user;
@@ -26,6 +28,13 @@ public class ApplicationController {
     private Roles role;
     @Autowired
     private DepositJPARepository depositRepo;
+    @Autowired
+    private Deposit deposit;
+    @Autowired
+    private DepositOptions depositOptions;
+    @Autowired
+    private DepositOptionsJpaRepository depositOptionRepo;
+    private DepositTransactionJpaRepository depositTransactionRepo;
 
     @GetMapping("/")
     public String getHomePage(){
@@ -84,11 +93,19 @@ public class ApplicationController {
         return userRepo.findByMobileNumber(number);
     }
 
-    @PostMapping(value = "saveDiposit",consumes="application/json")
+
+    @PostMapping(value = "createDiposit")
     @ResponseBody
-    public String saveDeposit(@RequestBody Deposit deposit) {
+    public String saveDeposit(@RequestParam("depositOptionId") int id, @RequestParam("userId") int userId) {
         String status = null;
         try {
+            depositOptions = depositOptionRepo.findById(id);
+            user = userRepo.findByUserId(id);
+            deposit.setTotalMonths(depositOptions.getMonths());
+            deposit.setTargetAmount(depositOptions.getAmount());
+            deposit.setTotalAmount((depositOptions.getAmount() * depositOptions.getPercentage())/100);
+            deposit.setLastInstallmentDate(LocalDateTime.now().plusMonths(depositOptions.getMonths()));
+            deposit.setUser(user);
             depositRepo.save(deposit);
             status = "success";
         } catch (Exception e) {
@@ -97,6 +114,29 @@ public class ApplicationController {
             status = "failed";
         }
         return status;
+    }
+
+    @PostMapping(value = "makeDipositTransaction",consumes="application/json")
+    @ResponseBody
+    public String makeDepositTransaction(@RequestBody DepositTransaction depositTransaction) {
+        String status = null;
+        try {
+            depositTransaction.setTime(LocalDateTime.now());
+            depositTransactionRepo.save(depositTransaction);
+            status = "success";
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            status = "failed";
+        }
+        return status;
+    }
+
+
+    @GetMapping("getUserDeposit")
+    @ResponseBody
+    public Deposit getDeposit(@RequestParam("userId") int id){
+        return depositRepo.findById(id);
     }
 
     @GetMapping("getUserDeposits")

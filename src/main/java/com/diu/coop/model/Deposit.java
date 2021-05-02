@@ -1,10 +1,12 @@
 package com.diu.coop.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @Entity
@@ -13,12 +15,15 @@ public class Deposit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int totalAmount;
+    private float targetAmount;
+    private float totalAmount;
     private int totalMonths;
-    private LocalDateTime firstInstallmentDate;
     private LocalDateTime lastInstallmentDate;
     @ManyToOne
     private Users user;
+    @OneToMany(mappedBy = "deposit")
+    @JsonIgnoreProperties("deposit")
+    private List<DepositTransaction> depositTransactions;
 
     public int getId() {
         return id;
@@ -28,11 +33,19 @@ public class Deposit {
         this.id = id;
     }
 
-    public int getTotalAmount() {
+    public float getTargetAmount() {
+        return targetAmount;
+    }
+
+    public void setTargetAmount(float targetAmount) {
+        this.targetAmount = targetAmount;
+    }
+
+    public float getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(int totalAmount) {
+    public void setTotalAmount(float totalAmount) {
         this.totalAmount = totalAmount;
     }
 
@@ -42,14 +55,6 @@ public class Deposit {
 
     public void setTotalMonths(int totalMonths) {
         this.totalMonths = totalMonths;
-    }
-
-    public LocalDateTime getFirstInstallmentDate() {
-        return firstInstallmentDate;
-    }
-
-    public void setFirstInstallmentDate(LocalDateTime firstInstallmentDate) {
-        this.firstInstallmentDate = firstInstallmentDate;
     }
 
     public LocalDateTime getLastInstallmentDate() {
@@ -66,5 +71,13 @@ public class Deposit {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public List<DepositTransaction> getDepositTransactions() {
+        return depositTransactions;
+    }
+
+    public void setDepositTransactions(List<DepositTransaction> depositTransactions) {
+        this.depositTransactions = depositTransactions;
     }
 }
